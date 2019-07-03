@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "gunzip-maybe": "^1.4.1",
+    "pipe-io": "^3.0.11",
     "tar-stream": "^2.0.1"
   }
 }

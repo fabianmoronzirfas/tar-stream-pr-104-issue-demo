@@ -1,5 +1,6 @@
 const fs = require('fs');
-const gunzip = require('gunzip-maybe');
+const pipe = require('pipe-io');
+const zlib =require('zlib');
 const path = require('path');
 const tarStream = require('tar-stream');
 const extract = tarStream.extract();
@@ -12,8 +13,8 @@ extract.on('finish', function() {
 extract.on('entry', (header, estream, next) => {
   try {
     console.log(header);
-    const writestream = fs.createWriteStream(path.resolve(__dirname, `./out/${header.name}`));
-    estream.pipe(writestream);
+    // const writestream = fs.createWriteStream(path.resolve(__dirname, `./out/${header.name}`));
+    // estream.pipe(zlib.createGunzip()).pipe(writestream);
 
     estream.on('end', () => {
       console.log(`done with stream`);
@@ -27,6 +28,13 @@ extract.on('entry', (header, estream, next) => {
 });
 const files = ['./data/mini-one.tar.gz', './data/mini-two.tar.gz'];
 for(const file of files){
+  console.log(file);
   const rstream = fs.createReadStream(path.resolve(__dirname, file));
-  rstream.pipe(gunzip(2)).pipe(extract);
+  pipe([rstream,zlib.createGunzip(), extract],(err)=>{
+    if(err){
+      throw err;
+    }
+    console.log(`done with ${file} pipe`);
+  })
+
 }
